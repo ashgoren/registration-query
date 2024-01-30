@@ -1,0 +1,27 @@
+{
+  "name": "query",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "firebase": "^9.17.2",
+    "firebase-admin": "^11.5.0",
+    "firebase-functions": "^4.2.1"
+  },
+  "scripts": {
+    "start": "node query"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "type": "module"
+}
