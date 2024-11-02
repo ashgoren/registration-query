@@ -9,7 +9,8 @@
     "firebase-functions": "^4.2.1"
   },
   "scripts": {
-    "start": "node query"
+    "start": "node query",
+    "pending": "node pending"
   },
   "browserslist": {
     "production": [

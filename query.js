@@ -14,15 +14,19 @@ const ordersRef = db.ref('orders');
 ordersRef.get().then((snapshot) => {
   if (snapshot.exists()) {
     snapshot.forEach((childSnapshot) => {
-      const key = childSnapshot.key;
-      const childData = childSnapshot.val();
-      const email = childData.emailConfirmation;
-      const date = new Date(childData.timestamp).toLocaleDateString();
-      const purchaser = childData.people[0];
-      const otherPerson = childData.people[1]?.first ? childData.people[1] : null;
-      const purchaserName = `${purchaser.first} ${purchaser.last}`;
-      const otherName = otherPerson ? `${otherPerson.first} ${otherPerson.last}` : '';
-      console.log(`${purchaserName}, ${otherName}, ${email}, ${date}, ${childData.electronicPaymentId}`);
+      try {
+        const key = childSnapshot.key;
+        const childData = childSnapshot.val();
+        const email = childData.emailConfirmation;
+        const date = new Date(childData.timestamp).toLocaleDateString();
+        const purchaser = childData.people[0];
+        const otherPerson = childData.people[1]?.first ? childData.people[1] : null;
+        const purchaserName = `${purchaser.first} ${purchaser.last}`;
+        const otherName = otherPerson ? `${otherPerson.first} ${otherPerson.last}` : '';
+        console.log(`${key}, ${purchaserName}, ${otherName}, ${email}, ${date}, ${childData.electronicPaymentId}`);
+      } catch (error) {
+        // console.error(error);
+      }
     });
   } else {
     console.log("No data available");
