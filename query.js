@@ -1,37 +1,43 @@
-import serviceAccount from './firebase-service-key.json' assert { type: 'json' };
+import fs from 'fs/promises';
 import admin from 'firebase-admin';
+import { getFirestore } from 'firebase-admin/firestore';
 import dotenv from 'dotenv';
 dotenv.config();
+const serviceAccount = JSON.parse(await fs.readFile(new URL('./firebase-service-key.json', import.meta.url), 'utf-8'));
+admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: process.env.FIREBASE_DATABASE_URL || process.env.REACT_APP_FIREBASE_DATABASE_URL,
-});
+const db = getFirestore();
+const ordersRef = db.collection('orders');
 
-const db = admin.database();
-const ordersRef = db.ref('orders');
-
-ordersRef.get().then((snapshot) => {
-  if (snapshot.exists()) {
-    snapshot.forEach((childSnapshot) => {
-      try {
-        const key = childSnapshot.key;
-        const childData = childSnapshot.val();
-        const email = childData.emailConfirmation;
-        const date = new Date(childData.timestamp).toLocaleDateString();
-        const purchaser = childData.people[0];
-        const otherPerson = childData.people[1]?.first ? childData.people[1] : null;
-        const purchaserName = `${purchaser.first} ${purchaser.last}`;
-        const otherName = otherPerson ? `${otherPerson.first} ${otherPerson.last}` : '';
-        console.log(`${key}, ${purchaserName}, ${otherName}, ${email}, ${date}, ${childData.electronicPaymentId}`);
-      } catch (error) {
-        // console.error(error);
-      }
-    });
-  } else {
-    console.log("No data available");
+try {
+  const ordersSnapshot = await ordersRef.get();
+  const orders = getOrders(ordersSnapshot).sort((a, b) => b.createdAt - a.createdAt);
+  for (const order of orders) {
+    // console.log(order);
+    const key = order.key;
+    const date = order.createdAt.toDate().toLocaleDateString();
+    const paymentId = order.paymentId;
+    const purchaser = order.people[0];
+    const email = purchaser.email;
+    const people = getPeople(order.people);
+    console.log(`${people}, ${key}, ${date}, ${email}, ${paymentId}`);
   }
-  admin.app().delete();
-}).catch((error) => {
+} catch (error) {
   console.error(error);
-});
+}
+
+function getOrders(snapshot) {
+  const orders = [];
+  snapshot.forEach((childSnapshot) => {
+    const key = childSnapshot.id;
+    const childData = childSnapshot.data();
+    orders.push({ key, ...childData });
+  });
+  return orders;
+}
+
+function getPeople(people) {
+  return people.map((person) => {
+    return `${person.first} ${person.last}`;
+  }).join(';');
+}
