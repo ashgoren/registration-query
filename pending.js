@@ -3,7 +3,15 @@ import admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 import dotenv from 'dotenv';
 dotenv.config();
-const serviceAccount = JSON.parse(await fs.readFile(new URL('./firebase-service-key.json', import.meta.url), 'utf-8'));
+
+const project = process.argv[2];
+if (!project) {
+  console.error('Usage: npm run pending <project>');
+  process.exit(1);
+}
+const serviceKeyFilename = `${project}-firebase-service-key.json`;
+
+const serviceAccount = JSON.parse(await fs.readFile(new URL(serviceKeyFilename, import.meta.url), 'utf-8'));
 admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
 
 const db = getFirestore();
