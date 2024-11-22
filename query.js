@@ -6,7 +6,7 @@ dotenv.config();
 
 const project = process.argv[2];
 if (!project) {
-  console.error('Usage: npm run pending <project>');
+  console.error('Usage: npm run query <project>');
   process.exit(1);
 }
 const serviceKeyFilename = `${project}-firebase-service-key.json`;
