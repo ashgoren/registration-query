@@ -15,7 +15,7 @@ const serviceAccount = JSON.parse(await fs.readFile(new URL(serviceKeyFilename, 
 admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
 
 const db = getFirestore();
-const ordersRef = db.collection('orders');
+const ordersRef = db.collection('orders'); // 'orders' or 'pendingOrders'
 
 try {
   const ordersSnapshot = await ordersRef.get();

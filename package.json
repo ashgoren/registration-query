@@ -10,7 +10,7 @@
   },
   "scripts": {
     "query": "node query",
-    "pending": "node pending"
+    "missing": "node missing"
   },
   "browserslist": {
     "production": [
