@@ -6,11 +6,10 @@
     "dotenv": "^16.3.1",
     "firebase": "^9.17.2",
     "firebase-admin": "^11.5.0",
-    "firebase-functions": "^4.2.1"
+    "firebase-functions": "^4.2.1",
+    "yargs": "^17.7.2"
   },
   "scripts": {
-    "query": "node query",
-    "missing": "node missing"
   },
   "browserslist": {
     "production": [

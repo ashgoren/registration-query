@@ -1,25 +1,49 @@
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 import fs from 'fs/promises';
 import admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const project = process.argv[2];
-if (!project) {
-  console.error('Usage: npm run query <project>');
-  process.exit(1);
-}
+const argv = yargs(hideBin(process.argv))
+  .usage('Usage: node orders <project> [--pending]')
+  .command('<project>', 'Specify the project', (yargs) => {
+    yargs.positional('project', {
+      describe: 'The project name',
+      type: 'string',
+    });
+  })
+  .option('pending', {
+    alias: 'p',
+    type: 'boolean',
+    description: 'Include pending orders',
+    default: false,
+  })
+  .demandCommand(1, 'You must specify a project')
+  .help()
+  .parse();
+
+const project = argv._[0];
+const pending = argv.pending;
+
+console.log('');
+console.log(`Project: ${project}`);
+console.log(pending ? 'PENDING ORDERS' : 'FINAL ORDERS');
+console.log('')
+
 const serviceKeyFilename = `${project}-firebase-service-key.json`;
 
 const serviceAccount = JSON.parse(await fs.readFile(new URL(serviceKeyFilename, import.meta.url), 'utf-8'));
 admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
 
 const db = getFirestore();
-const ordersRef = db.collection('orders'); // 'orders' or 'pendingOrders'
+const ordersRef = db.collection(pending ? 'pendingOrders' : 'orders');
 
 try {
   const ordersSnapshot = await ordersRef.get();
   const orders = getOrders(ordersSnapshot).sort((a, b) => b.createdAt - a.createdAt);
+  console.log('');
   for (const order of orders) {
     // console.log(order);
     const key = order.key;
@@ -30,6 +54,7 @@ try {
     const people = getPeople(order.people);
     console.log(`${people}, ${key}, ${date}, ${email}, ${paymentId}`);
   }
+  console.log('');
 } catch (error) {
   console.error(error);
 }

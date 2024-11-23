@@ -2,23 +2,19 @@
 
 # Configuration
 
-## Fill in Firebase values in `.env` 
-
-- Can copy `.env` file from the relevant project
-
-## Create `firebase-service-key.json`
+## Create service key file
 
 - Generate new private key from [project settings service accounts](https://console.firebase.google.com/project/[PROJECT_ID]/settings/serviceaccounts/adminsdk)
 - Rename to `<projectId>-firebase-service-key.json`
 
-# Usage for query (list of all completed orders)
+# Usage to list all completed orders (or pending, with flag)
 
 ```sh
-npm start
+node orders <project> [--pending]
 ```
 
-# Usage for pending (list of pending orders with uuid not found in orders)
+# Usage to list any pendingOrders missing from orders (based on uuid)
 
 ```sh
-npm run pending
+node missing <project>
 ```
