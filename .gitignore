@@ -16,6 +16,7 @@
 .DS_Store
 .env*
 *service-key*
+credentials/*
 
 *debug.log*
 *error.log*

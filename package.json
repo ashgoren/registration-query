@@ -7,10 +7,10 @@
     "firebase": "^9.17.2",
     "firebase-admin": "^11.5.0",
     "firebase-functions": "^4.2.1",
+    "googleapis": "^144.0.0",
     "yargs": "^17.7.2"
   },
-  "scripts": {
-  },
+  "scripts": {},
   "browserslist": {
     "production": [
       ">0.2%",

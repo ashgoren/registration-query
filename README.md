@@ -1,20 +1,51 @@
-# Query Firebase Realtime database for list of entries
+# Query Firestore & Google Sheets
+## Companion for [Contra Registration App](https://github.com/mgoren/registration-template)
 
-# Configuration
+- list all orders
+- list any pending orders not finalized
+- list any emails present in database but missing from spreadsheet
+- list any duplicate emails in spreadsheet
 
-## Create service key file
+## Configuration
+
+### Create Service Key Files
+
+#### Firebase
 
 - Generate new private key from [project settings service accounts](https://console.firebase.google.com/project/[PROJECT_ID]/settings/serviceaccounts/adminsdk)
-- Rename to `<projectId>-firebase-service-key.json`
+- Put in `credentials` directory, rename to `<project>-firebase-service-key.json`
 
-# Usage to list all completed orders (or pending, with flag)
+#### Google Sheets
+
+- In `credentials` directory: `gcloud iam service-accounts keys create <project>-sheets-service-key.json --iam-account sheets@<projectId>.iam.gserviceaccount.com`
+
+*Verify credentials are not included in git commit!*
+
+### Configure Environment Variables
+
+- Copy `.example.env` to `.env` and fill in values.
+
+---
+
+## Usage
+
+_Note_: By default these scripts ignore emails listed as test domains in `.env`. To include them, use the `--all`/`--include-test-emails` flag.
+
+
+## Usage to list all completed orders (or pending, with flag)
 
 ```sh
-node orders <project> [--pending]
+node orders <project> [--pending] [--include-test-emails]
 ```
 
 # Usage to list any pendingOrders missing from orders (based on uuid)
 
 ```sh
-node missing <project>
+node missing <project> [--include-test-emails]
+```
+
+# Usage to list any emails missing from spreadsheeet, as well as duplicate emails
+
+```sh
+node spreadsheet <project> [--include-test-emails]
 ```

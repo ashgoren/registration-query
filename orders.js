@@ -1,75 +1,30 @@
-import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
-import fs from 'fs/promises';
-import admin from 'firebase-admin';
-import { getFirestore } from 'firebase-admin/firestore';
-import dotenv from 'dotenv';
-dotenv.config();
+import { pending, orders, pendingOrders, log } from './shared.js';
 
-const argv = yargs(hideBin(process.argv))
-  .usage('Usage: node orders <project> [--pending]')
-  .command('<project>', 'Specify the project', (yargs) => {
-    yargs.positional('project', {
-      describe: 'The project name',
-      type: 'string',
-    });
-  })
-  .option('pending', {
-    alias: 'p',
-    type: 'boolean',
-    description: 'Include pending orders',
-    default: false,
-  })
-  .demandCommand(1, 'You must specify a project')
-  .help()
-  .parse();
-
-const project = argv._[0];
-const pending = argv.pending;
-
-console.log('');
-console.log(`Project: ${project}`);
-console.log(pending ? 'PENDING ORDERS' : 'FINAL ORDERS');
-console.log('')
-
-const serviceKeyFilename = `${project}-firebase-service-key.json`;
-
-const serviceAccount = JSON.parse(await fs.readFile(new URL(serviceKeyFilename, import.meta.url), 'utf-8'));
-admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-
-const db = getFirestore();
-const ordersRef = db.collection(pending ? 'pendingOrders' : 'orders');
+console.log(pending ? '\nPENDING ORDERS\n' : '\nFINAL ORDERS\n');
+const theOrders = pending ? pendingOrders : orders;
 
 try {
-  const ordersSnapshot = await ordersRef.get();
-  const orders = getOrders(ordersSnapshot).sort((a, b) => b.createdAt - a.createdAt);
-  console.log('');
-  for (const order of orders) {
+  for (const order of theOrders) {
     // console.log(order);
     const key = order.key;
     const date = order.createdAt.toDate().toLocaleDateString();
     const paymentId = order.paymentId;
     const purchaser = order.people[0];
     const email = purchaser.email;
-    const people = getPeople(order.people);
-    console.log(`${people}, ${key}, ${date}, ${email}, ${paymentId}`);
+    const people = formatPeople(order.people);
+    log({
+      message: `${people}, ${key}, ${date}, ${email}, ${paymentId}`,
+      email
+    });
   }
-  console.log('');
 } catch (error) {
   console.error(error);
 }
+console.log('');
 
-function getOrders(snapshot) {
-  const orders = [];
-  snapshot.forEach((childSnapshot) => {
-    const key = childSnapshot.id;
-    const childData = childSnapshot.data();
-    orders.push({ key, ...childData });
-  });
-  return orders;
-}
 
-function getPeople(people) {
+// helper function
+function formatPeople(people) {
   return people.map((person) => {
     return `${person.first} ${person.last}`;
   }).join(';');
