@@ -38,7 +38,7 @@ _Note_: By default these scripts ignore emails listed as test domains in `.env`.
 node orders <project> [--pending] [--include-test-emails]
 ```
 
-# Usage to list any pendingOrders missing from orders (based on uuid)
+# Usage to list any pending orders not finalized
 
 ```sh
 node missing <project> [--include-test-emails]

@@ -54,8 +54,9 @@ const sheets = google.sheets({ version: 'v4', auth: sheetsClient });
 
 // get data from firestore
 const db = getFirestore();
-const pendingOrders = await getOrders('pendingOrders');
-const orders = await getOrders('orders');
+const allOrders = await getOrders('orders');
+const pendingOrders = allOrders.filter((order) => order.status === 'pending');
+const orders = allOrders.filter((order) => order.status === 'final');
 
 // helper functions
 
